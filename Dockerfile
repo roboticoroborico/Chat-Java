@@ -1,4 +1,4 @@
-FROM eclipse-temurin:23 AS build
+FROM eclipse-temurin:22 AS build
 
 # Installa Maven manualmente
 #RUN apt update && apt install -y curl \
@@ -14,7 +14,7 @@ RUN apt update && apt install -y maven
 RUN mvn clean package
 
 # Usa OpenJDK 22 per eseguire l'applicazione
-FROM eclipse-temurin:23 AS runtime
+FROM eclipse-temurin:22 AS runtime
 WORKDIR /app
 COPY --from=build /app/target/*.jar /app/*.jar
 
