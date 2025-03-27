@@ -1,6 +1,4 @@
-CREATE DATABASE CHAT_DB;
-
-\c CHAT_DB
+\c chatdb
 
 CREATE TABLE users (
     id                  SERIAL PRIMARY KEY,
