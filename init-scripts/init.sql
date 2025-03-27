@@ -40,7 +40,7 @@ INSERT INTO users (username, password, link_profile_photo) VALUES
 ('Giacomo', '123', 'https://media.tenor.com/-GLxXYXKdlAAAAAe/cinema-absolute.png'),
 ('Alessandro', '123', 'https://media.tenor.com/-GLxXYXKdlAAAAAe/cinema-absolute.png'),
 ('Elia', '123', 'https://media.tenor.com/-GLxXYXKdlAAAAAe/cinema-absolute.png'),
-('Matteo', '123', 'https://media.tenor.com/-GLxXYXKdlAAAAAe/cinema-absolute.png');
+('Matteo', '123', 'https://media.tenor.com/-GLxXYXKdlAAAAAe/cinema-absolute.png'),
 ('Renzo', '123', 'https://media.tenor.com/-GLxXYXKdlAAAAAe/cinema-absolute.png');
 
 INSERT INTO chats (is_group, group_name, link_group_photo) VALUES
