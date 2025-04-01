@@ -1,4 +1,4 @@
-package com.example.Client.client;
+package client;
 
 import javafx.application.Application;
 import javafx.geometry.Orientation;
