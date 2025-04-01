@@ -16,7 +16,7 @@ CREATE TABLE chats (
 
 CREATE TABLE messages (
     id                  SERIAL PRIMARY KEY,
-    text                TEXT UNIQUE NOT NULL,
+    text                TEXT NOT NULL,
     sender_user_id      INTEGER NOT NULL,
     reciever_chat_id    INTEGER NOT NULL,
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

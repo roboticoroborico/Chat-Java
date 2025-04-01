@@ -6,14 +6,21 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Server {
     private static final int PORT = 42069;
     private static Map<String, PrintWriter> clients = new HashMap<>();
+    private static final String URL = "jdbc:postgresql://0.0.0.0:5432/chatdb";
+    private static final String USER = "postgres";
+    private static final String PASSWORD = "postgres";
 
     public static void main(String[] args) {
+        connect();
         System.out.println("Acceso");
         
         try (ServerSocket serverSocket = new ServerSocket(PORT);){
@@ -23,6 +30,21 @@ public class Server {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    private static Connection connect(){
+        try {
+            Class.forName("org.postgresql.Driver");
+            Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("✅ Connessione riuscita!");
+            return conn;
+        } catch (ClassNotFoundException e) {
+            System.err.println("Driver non trovato: " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("❌ Errore di connessione: " + e.getMessage());
+            return null;
+        }
+        return null;
     }
 
     private static class ClientHandler extends Thread {
