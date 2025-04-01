@@ -15,7 +15,7 @@ import java.util.Map;
 public class Server {
     private static final int PORT = 42069;
     private static Map<String, PrintWriter> clients = new HashMap<>();
-    private static final String URL = "jdbc:postgresql://0.0.0.0:5432/chatdb";
+    private static final String URL = "jdbc:postgresql://db:5432/chatdb";
     private static final String USER = "postgres";
     private static final String PASSWORD = "postgres";
 
@@ -38,13 +38,11 @@ public class Server {
             Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
             System.out.println("✅ Connessione riuscita!");
             return conn;
-        } catch (ClassNotFoundException e) {
-            System.err.println("Driver non trovato: " + e.getMessage());
+        } catch (ClassNotFoundException e) {  System.err.println("Driver non trovato: " + e.getMessage()); return null;
         } catch (SQLException e) {
             System.out.println("❌ Errore di connessione: " + e.getMessage());
             return null;
         }
-        return null;
     }
 
     private static class ClientHandler extends Thread {
