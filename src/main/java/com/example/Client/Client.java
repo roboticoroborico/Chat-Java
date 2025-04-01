@@ -1,4 +1,4 @@
-package com.example.client;
+package com.example.Client;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -20,8 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Client {
     private static final String SERVER_IP = "127.0.0.1";
