@@ -1,4 +1,4 @@
-package com.example.Client;
+package com.example.client;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,7 +36,7 @@ public class Client {
     private DefaultListModel userListModel;
     private JButton darkModeButton;
     private JOptionPane alertWindow = new JOptionPane();
-    
+
     private String username;
 
     public Client() {
@@ -57,10 +57,10 @@ public class Client {
         panel.add(darkModeButton);
 
         panel.setBackground(Color.LIGHT_GRAY);
-        
+
         userListModel = new DefaultListModel<>();
         userList = new JList<>(userListModel);
-        
+
         JPanel userListPanel = new JPanel();
         userListPanel.add(userList);
         userListPanel.setPreferredSize(new Dimension(225, 0));

@@ -21,7 +21,7 @@ CREATE TABLE messages (
     reciever_chat_id    INTEGER NOT NULL,
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_sender_user FOREIGN KEY (sender_user_id) REFERENCES users (id),
     CONSTRAINT fk_receiver_chat FOREIGN KEY (reciever_chat_id) REFERENCES chats (id)
 );
