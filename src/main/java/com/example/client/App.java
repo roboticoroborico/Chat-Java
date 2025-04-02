@@ -1,4 +1,4 @@
-package client;
+package com.example.client;
 
 import javafx.application.Application;
 import javafx.geometry.Orientation;
@@ -18,7 +18,7 @@ public class App extends Application {
     @SuppressWarnings("exports")
     @Override
     public void start(Stage stage) throws Exception {
-        
+
         FlowPane flow = new FlowPane(Orientation.VERTICAL);
         flow.setHgap(0);
         flow.setVgap(0);
@@ -28,7 +28,7 @@ public class App extends Application {
 
         FlowPane header = new FlowPane();
         header.setPrefHeight(headerHeight);
-        header.setPrefWidth(stage.getWidth()); 
+        header.setPrefWidth(stage.getWidth());
         header.setStyle("-fx-background-color:rgb(255, 146, 146);");
         flow.getChildren().add(header);
 

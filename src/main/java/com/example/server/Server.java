@@ -22,9 +22,9 @@ public class Server {
     public static void main(String[] args) {
         connect();
         System.out.println("Acceso");
-        
+
         try (ServerSocket serverSocket = new ServerSocket(PORT);){
-            while (true) { 
+            while (true) {
                 new ClientHandler(serverSocket.accept()).start();
             }
         } catch (IOException ex) {
@@ -59,9 +59,9 @@ public class Server {
             try {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
-                
+
                 //username check
-                while (true) { 
+                while (true) {
                     username = in.readLine();
                     if (!clients.containsKey(username)){
                         out.println("ok");
