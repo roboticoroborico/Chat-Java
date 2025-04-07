@@ -140,8 +140,41 @@ public class Server {
             broadcastMessage(list);
         }
 
+        private static void getAllMessagesFromDatabase(PrintWriter out) {
+            String query = "SELECT user_id, content, timestamp FROM messages ORDER BY timestamp ASC";
+            
+            try (Connection conn = connect();
+                 java.sql.PreparedStatement stmt = conn.prepareStatement(query)) {
+        
+                java.sql.ResultSet rs = stmt.executeQuery();
+        
+                out.println(">> Tutti i messaggi presenti nel database:");
+        
+                boolean found = false;
+                while (rs.next()) {
+                    found = true;
+                    String user = rs.getString("user_id");
+                    String content = rs.getString("content");
+                    String timestamp = rs.getTimestamp("timestamp").toString();
+                    out.println("[" + timestamp + "] " + user + ": " + content);
+                }
+        
+                if (!found) {
+                    out.println(">> Nessun messaggio presente nel database.");
+                }
+        
+            } catch (SQLException e) {
+                e.printStackTrace();
+                out.println(">> Errore nella query dei messaggi.");
+            }
+        }
+
+        
+        
+
         private void commandList(String command){
             String[] formattedMessage = command.split(" ", 2);
+            // all'interno di commandList:
             switch (formattedMessage[0]) {
                 case "listUsers" -> {
                     getUsersFromDatabase();
@@ -154,6 +187,9 @@ public class Server {
                         out.println(">> Usage: /messages <username>");
                     }
                 }
+                case "allChats" -> {
+                    getAllMessagesFromDatabase(out);
+                }
                 case "p" -> {
                     String[] privateMessage = formattedMessage[1].split(" ", 2);
                     privateMessage(privateMessage[0], username + ": (whisper) " + privateMessage[1]);
@@ -162,13 +198,16 @@ public class Server {
                     out.println("Commands available:");
                     out.println("/listUsers - Show users in the database");
                     out.println("/messages <username> - Show messages from user");
+                    out.println("/allChats - Show all messages in the database");
                     out.println("/p <username> <message> - Private message");
                 }
                 default -> {
                     out.println(">> Server: comando non esistente");
                 }
             }
+
         }
+        
         
         
 
