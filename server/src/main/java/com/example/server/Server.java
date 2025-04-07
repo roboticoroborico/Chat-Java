@@ -143,32 +143,64 @@ public class Server {
         private void commandList(String command){
             String[] formattedMessage = command.split(" ", 2);
             switch (formattedMessage[0]) {
-                // case "list" -> {
-                //     out.println(">> Connected users: ");
-                //     for (String username : clients.keySet()) {
-                //         out.println("   - " + username);
-                //     }
-                // }
+                case "listUsers" -> {
+                    // Esegui la query e mostra gli utenti
+                    getUsersFromDatabase();
+                    out.println(">> Users listed from database.");
+                }
                 case "p" -> {
                     String[] privateMessage = formattedMessage[1].split(" ", 2);
                     privateMessage(privateMessage[0], username + ": (whisper) " + privateMessage[1]);
                 }
                 case "?" -> {
-                    // show list of commands
+                    out.println("Commands available:");
+                    out.println("/listUsers - Show users in the database");
+                    out.println("/p <username> <message> - Private message");
                 }
                 default -> {
                     out.println(">> Server: comando non esistente");
                 }
             }
         }
+        
 
-        private void broadcastMessage(String message) {
+        private static void broadcastMessage(String message) {
             synchronized (clients) {
                 for (PrintWriter printWriter : clients.values()) {
                     printWriter.println(message);
                 }
             }
         }
+
+        private static void getUsersFromDatabase() {
+            try (Connection conn = connect(); 
+                 java.sql.Statement stmt = conn.createStatement()) {
+                String query = "SELECT username FROM users";
+                java.sql.ResultSet rs = stmt.executeQuery(query);
+                
+                StringBuilder usersList = new StringBuilder("Users in DB: ");
+                while (rs.next()) {
+                    usersList.append(rs.getString("username")).append(", ");
+                }
+        
+                // Rimuove l'ultima virgola e spazio
+                if (usersList.length() > 0) {
+                    usersList.setLength(usersList.length() - 2);
+                }
+        
+                // Stampa nella console
+                System.out.println(usersList.toString());
+        
+                // Invia la lista a tutti i client connessi
+                broadcastMessage(usersList.toString());
+        
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }        
+
+
+
 
         private void privateMessage(String user, String message){
             synchronized (clients) {
