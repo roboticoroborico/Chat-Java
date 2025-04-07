@@ -144,9 +144,15 @@ public class Server {
             String[] formattedMessage = command.split(" ", 2);
             switch (formattedMessage[0]) {
                 case "listUsers" -> {
-                    // Esegui la query e mostra gli utenti
                     getUsersFromDatabase();
                     out.println(">> Users listed from database.");
+                }
+                case "messages" -> {
+                    if (formattedMessage.length > 1) {
+                        getMessagesFromUser(formattedMessage[1]);
+                    } else {
+                        out.println(">> Usage: /messages <username>");
+                    }
                 }
                 case "p" -> {
                     String[] privateMessage = formattedMessage[1].split(" ", 2);
@@ -155,6 +161,7 @@ public class Server {
                 case "?" -> {
                     out.println("Commands available:");
                     out.println("/listUsers - Show users in the database");
+                    out.println("/messages <username> - Show messages from user");
                     out.println("/p <username> <message> - Private message");
                 }
                 default -> {
@@ -162,6 +169,7 @@ public class Server {
                 }
             }
         }
+        
         
 
         private static void broadcastMessage(String message) {
@@ -197,9 +205,36 @@ public class Server {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }        
+        }
 
-
+        private void getMessagesFromUser(String username) {
+            String query = "SELECT content, timestamp FROM messages WHERE user_id = ?";
+            
+            try (Connection conn = connect();
+                 java.sql.PreparedStatement pstmt = conn.prepareStatement(query)) {
+        
+                pstmt.setString(1, username); // Supponendo che user_id sia una stringa (username)
+        
+                java.sql.ResultSet rs = pstmt.executeQuery();
+                
+                boolean hasMessages = false;
+                while (rs.next()) {
+                    hasMessages = true;
+                    String msg = rs.getString("content");
+                    String timestamp = rs.getString("timestamp");
+                    out.println("[" + timestamp + "] " + username + ": " + msg);
+                }
+        
+                if (!hasMessages) {
+                    out.println(">> Nessun messaggio trovato per l'utente: " + username);
+                }
+        
+            } catch (SQLException e) {
+                e.printStackTrace();
+                out.println(">> Errore durante il recupero dei messaggi.");
+            }
+        }
+        
 
 
         private void privateMessage(String user, String message){
