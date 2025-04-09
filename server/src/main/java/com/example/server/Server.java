@@ -143,11 +143,11 @@ public class Server {
         }
 
         private static void getAllMessagesFromDatabase(PrintWriter out) {
-            String query = "SELECT m.content, m.timestamp, u.username, c.group_name " +
+            String query = "SELECT m.text, m.created_at, u.username, c.group_name " +
                            "FROM messages m " +
                            "JOIN users u ON m.sender_user_id = u.id " +
                            "JOIN chats c ON m.reciever_chat_id = c.id " +
-                           "ORDER BY m.timestamp ASC";
+                           "ORDER BY m.created_at ASC";
             
             try (Connection conn = connect();
                  java.sql.PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -268,7 +268,7 @@ public class Server {
                     int userId = rs.getInt("id");
                     
                     // Now query the messages for this user_id
-                    String query = "SELECT content, timestamp FROM messages WHERE sender_user_id = ?";
+                    String query = "SELECT text, created_at FROM messages WHERE sender_user_id = ?";
                     try (PreparedStatement msgStmt = conn.prepareStatement(query)) {
                         msgStmt.setInt(1, userId);  // Use the user_id in the messages query
                         ResultSet msgRs = msgStmt.executeQuery();
