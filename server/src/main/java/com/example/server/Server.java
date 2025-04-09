@@ -8,6 +8,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -141,33 +143,39 @@ public class Server {
         }
 
         private static void getAllMessagesFromDatabase(PrintWriter out) {
-            String query = "SELECT user_id, content, timestamp FROM messages ORDER BY timestamp ASC";
+            String query = "SELECT m.content, m.timestamp, u.username, c.group_name " +
+                           "FROM messages m " +
+                           "JOIN users u ON m.sender_user_id = u.id " +
+                           "JOIN chats c ON m.reciever_chat_id = c.id " +
+                           "ORDER BY m.timestamp ASC";
             
             try (Connection conn = connect();
                  java.sql.PreparedStatement stmt = conn.prepareStatement(query)) {
-        
+                
                 java.sql.ResultSet rs = stmt.executeQuery();
-        
+                
                 out.println(">> Tutti i messaggi presenti nel database:");
-        
+                
                 boolean found = false;
                 while (rs.next()) {
                     found = true;
-                    String user = rs.getString("user_id");
+                    String user = rs.getString("username");
+                    String group = rs.getString("group_name");
                     String content = rs.getString("content");
                     String timestamp = rs.getTimestamp("timestamp").toString();
-                    out.println("[" + timestamp + "] " + user + ": " + content);
+                    out.println("[" + timestamp + "] " + user + " (" + group + "): " + content);
                 }
-        
+                
                 if (!found) {
                     out.println(">> Nessun messaggio presente nel database.");
                 }
-        
+                
             } catch (SQLException e) {
                 e.printStackTrace();
                 out.println(">> Errore nella query dei messaggi.");
             }
         }
+        
 
         
         
@@ -247,32 +255,47 @@ public class Server {
         }
 
         private void getMessagesFromUser(String username) {
-            String query = "SELECT content, timestamp FROM messages WHERE user_id = ?";
+            // Query to get the user_id based on the username
+            String userIdQuery = "SELECT id FROM users WHERE username = ?";
             
             try (Connection conn = connect();
-                 java.sql.PreparedStatement pstmt = conn.prepareStatement(query)) {
-        
-                pstmt.setString(1, username); // Supponendo che user_id sia una stringa (username)
-        
+                java.sql.PreparedStatement pstmt = conn.prepareStatement(userIdQuery)) {
+                
+                pstmt.setString(1, username);  // Set the username in the query
                 java.sql.ResultSet rs = pstmt.executeQuery();
                 
-                boolean hasMessages = false;
-                while (rs.next()) {
-                    hasMessages = true;
-                    String msg = rs.getString("content");
-                    String timestamp = rs.getString("timestamp");
-                    out.println("[" + timestamp + "] " + username + ": " + msg);
+                if (rs.next()) {
+                    int userId = rs.getInt("id");
+                    
+                    // Now query the messages for this user_id
+                    String query = "SELECT content, timestamp FROM messages WHERE sender_user_id = ?";
+                    try (PreparedStatement msgStmt = conn.prepareStatement(query)) {
+                        msgStmt.setInt(1, userId);  // Use the user_id in the messages query
+                        ResultSet msgRs = msgStmt.executeQuery();
+                        
+                        boolean hasMessages = false;
+                        while (msgRs.next()) {
+                            hasMessages = true;
+                            String msg = msgRs.getString("content");
+                            String timestamp = msgRs.getString("timestamp");
+                            out.println("[" + timestamp + "] " + username + ": " + msg);
+                        }
+                
+                        if (!hasMessages) {
+                            out.println(">> Nessun messaggio trovato per l'utente: " + username);
+                        }
+                    }
+                
+                } else {
+                    out.println(">> Utente non trovato: " + username);
                 }
-        
-                if (!hasMessages) {
-                    out.println(">> Nessun messaggio trovato per l'utente: " + username);
-                }
-        
+                
             } catch (SQLException e) {
                 e.printStackTrace();
                 out.println(">> Errore durante il recupero dei messaggi.");
             }
         }
+
         
 
 
