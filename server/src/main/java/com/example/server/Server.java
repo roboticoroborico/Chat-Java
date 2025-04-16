@@ -184,6 +184,25 @@ public class Server {
             String[] formattedMessage = command.split(" ", 2);
             // all'interno di commandList:
             switch (formattedMessage[0]) {
+                case "register" -> {
+                    if (formattedMessage.length > 1) {
+                        String[] credentials = formattedMessage[1].split(" ", 2);
+                        if (credentials.length == 2) {
+                            String username = credentials[0];
+                            String password = credentials[1];
+                            if (registerUser(username, password)) {
+                                out.println("Registration successful!");
+                            } else {
+                                out.println("Registration failed. Username might already be taken.");
+                            }
+                        } else {
+                            out.println("Usage: /register <username> <password>");
+                        }
+                    } else {
+                        out.println("Usage: /register <username> <password>");
+                    }
+                }
+
                 case "listUsers" -> {
                     getUsersFromDatabase();
                     out.println(">> Users listed from database.");
@@ -237,8 +256,6 @@ public class Server {
                 while (rs.next()) {
                     usersList.append(rs.getString("username")).append(", ");
                 }
-        
-                // Rimuove l'ultima virgola e spazio
                 if (usersList.length() > 0) {
                     usersList.setLength(usersList.length() - 2);
                 }
@@ -308,6 +325,31 @@ public class Server {
                 else {
                     out.println("User doesn't exit");
                 }
+            }
+        }
+
+        private boolean registerUser(String username, String password) {
+            String checkQuery = "SELECT 1 FROM users WHERE username = ?";
+            try (Connection conn = connect();
+                PreparedStatement stmt = conn.prepareStatement(checkQuery)) {
+                stmt.setString(1, username);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    out.println("Username already taken");
+                    return false;
+                }
+
+                String insertQuery = "INSERT INTO users (username, password) VALUES (?, ?)";
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+                    insertStmt.setString(1, username);
+                    insertStmt.setString(2, password);
+                    insertStmt.executeUpdate();
+                    return true;
+                }
+            } catch (SQLException e) {
+                System.err.println("Registration error: " + e.getMessage());
+                return false;
             }
         }
     }
