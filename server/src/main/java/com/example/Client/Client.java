@@ -22,7 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 public class Client {
-    private static final String SERVER_IP = "192.168.172.193";
+    private static final String SERVER_IP = "127.0.0.1";
     private static final int PORT = 42069;
 
     private PrintWriter out;
@@ -128,6 +128,12 @@ public class Client {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
+            JButton registerButton = new JButton("Register");
+            registerButton.addActionListener(event -> registerUser());
+            JPanel registerPanel = new JPanel();
+            registerPanel.add(registerButton);
+            frame.getContentPane().add(registerPanel, BorderLayout.NORTH);
+
             String msg = "";
 
             // Prompt per il nome utente
@@ -140,13 +146,6 @@ public class Client {
                     msg = in.readLine();
                 }
             } while (!msg.equals("ok"));
-
-            // Aggiungi pulsante di registrazione
-            JButton registerButton = new JButton("Register");
-            registerButton.addActionListener(event -> registerUser());
-            JPanel registerPanel = new JPanel();
-            registerPanel.add(registerButton);
-            frame.getContentPane().add(registerPanel, BorderLayout.NORTH);
 
             // Gestione della chat
             new Thread(() -> {
@@ -183,9 +182,7 @@ public class Client {
                 continue;
             }
     
-            out.println("/register");
-            out.println(newUsername);
-            out.println(password);
+            out.println("/register" + " " + newUsername + " " + password);
             String response = null;
             try {
                 response = in.readLine();
